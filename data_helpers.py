@@ -206,11 +206,16 @@ def find_optimal_classifier(X, y, cutoffs, n_estimators=100, test_size=.30, rand
         results[str(cutoff)] = accuracy_score(y_test, y_test_preds)
 
     if plot:
-        plt.plot(num_feats, acc_scores_test, label='Test', alpha=.5)
-        plt.xlabel('Number of Features')
-        plt.ylabel('Accuracy score')
-        plt.title('Accuracy score by Number of Features')
-        plt.legend(loc=1)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+        fig.suptitle('Accuracy score by Number of Features')
+
+        ax1.plot(num_feats, acc_scores_train, label='Train', alpha=.5)
+        ax1.set(xlabel='Number of Features', ylabel='Accuracy score')
+        ax1.legend(loc=1)
+
+        ax2.plot(num_feats, acc_scores_test, label='Test', alpha=.5)
+        ax2.set(xlabel='Number of Features', ylabel='Accuracy score')
+        ax2.legend(loc=1)
         plt.show()
 
     best_cutoff = max(results, key=results.get)
