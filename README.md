@@ -24,7 +24,7 @@ For this project, I have used [Stack Overflow data from 2019](https://insights.s
 what factors lead developers to stay longer in their current jobs. I have broken the analysis down in the 
 following questions: 
 
-1. Does the job role lead the developers stay longer in the job ?
+1. Does the job role lead developers stay longer in the job ?
 2. Wishing to become a manager leads developers stay longer in a job ?
 3. What other factors lead developers stay longer in their jobs ?
 
@@ -32,7 +32,7 @@ following questions:
 
 * **exploratory_analysis.ipynb**: notebook to tackle questions 1 and 2.
 * **years_current_job_prediction.ipynb**: notebook to train a model and tackle question 3. 
-* **reports/**: notebook output in pdf format. *Some Javascript visualizations are not visible in the github ipynb rendering*
+* **reports/**: notebook output in markdown format. *Some Javascript visualizations are not visible in the github ipynb rendering*
 * **data_helper.py**: python functions used in the notebooks
 
 ## Results<a name="results"></a>
