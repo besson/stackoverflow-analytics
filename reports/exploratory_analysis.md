@@ -483,8 +483,8 @@ Let's also prepared `YearsCode` variable:
 
 
 ```python
-p1_df['YearsCode'] = p1_df['YearsCode'].fillna(value=-1)
-p1_df.loc[:,'YearsCode'] = p1_df['YearsCode'].apply(transform_coding_experience)
+p1_df['YearsCodePro'] = p1_df['YearsCodePro'].fillna(value=-1)
+p1_df.loc[:,'YearsCodePro'] = p1_df['YearsCodePro'].apply(transform_coding_experience)
 ```
 
 ### Answering the question
@@ -499,7 +499,7 @@ agg_p1_df = p1_df.groupby(['JobRole']).agg({'YearsInTheJob': lambda x: x.value_c
 
 plt.figure(figsize=(12,6))
 sns.barplot(x='YearsInTheJob', y='JobRole', orient='h', data=agg_p1_df, color='cornflowerblue');
-plt.title('Years in the current job per job role');
+plt.title('Years in the current job by job role (mode)');
 ```
 
 
@@ -544,14 +544,14 @@ top_roles = ['System administrator', 'Database administrator', 'Senior executive
 for idx, job_role in enumerate(job_roles):
     ax = fig.add_subplot(5, 5, idx + 1)
     
-    data = p1_df[p1_df.JobRole == job_role][['YearsCode']]
+    data = p1_df[p1_df.JobRole == job_role][['YearsCodePro']]
     
     if job_role in top_roles:
-        sns.histplot(data=data, bins=20, ax=ax, x='YearsCode', color='darkorange', kde=True)
+        sns.histplot(data=data, bins=20, ax=ax, x='YearsCodePro', color='darkorange', kde=True)
     else:
-        sns.histplot(data=data, bins=20, ax=ax, x='YearsCode', kde=True)
+        sns.histplot(data=data, bins=20, ax=ax, x='YearsCodePro', kde=True)
       
-    ax.set(xlabel='Years coding', ylabel='density')
+    ax.set(xlabel='Years coding pro', ylabel='density')
     ax.set_title(job_role)
     
 plt.show();
@@ -647,7 +647,7 @@ agg_p2_df = p2_df.groupby(['JobRole']).agg({'YearsInTheJob': lambda x: x.value_c
 
 plt.figure(figsize=(12,6))
 sns.barplot(x='YearsInTheJob', y='JobRole', orient='h', data=agg_p2_df, color='cornflowerblue');
-plt.title('Years in the current job per job role when whishing to become a manager');
+plt.title('Years in the current job by job role when whishing to become a manager');
 ```
 
 
@@ -662,26 +662,26 @@ It seems that wishing to become a manager in the future does not make profession
 
 
 ```python
-df2[df2.QuestionText == 'Including any education, how many years have you been coding?']['Column'].values[0]
+df2[df2.QuestionText == 'How many years have you coded professionally (as a part of your work)?']['Column'].values[0]
 ```
 
 
 
 
-    'YearsCode'
+    'YearsCodePro'
 
 
 
 
 ```python
-p2a_df = p2_df[p2_df.YearsCode >= 10]
+p2a_df = p2_df[p2_df.YearsCodePro >= 10]
 p2a_df.shape
 ```
 
 
 
 
-    (17886, 87)
+    (7954, 87)
 
 
 
@@ -693,7 +693,7 @@ agg_p2a_df = p2a_df.groupby(['JobRole']).agg({'YearsInTheJob': lambda x: x.value
 
 plt.figure(figsize=(12,6))
 sns.barplot(x='YearsInTheJob', y='JobRole', orient='h', data=agg_p2a_df, color='cornflowerblue');
-plt.title('Years in the current job per job role when whishing to become a manager (> 10 years coding)');
+plt.title('Years in the current job by job role when whishing to become a manager (> 10 years coding)');
 ```
 
 
@@ -704,4 +704,9 @@ plt.title('Years in the current job per job role when whishing to become a manag
 
 #### Conclusions
 
-Based on the least plot, it seems we can accept our hypothesis. More experienced professionals who wish to become a manager in the future are longer in their current jobs!
+Based on the last plot, the data suggest our hypothesis is promising. Most of the pore experienced developers who wish to become a manager in the future are longer in their current jobs!
+
+
+```python
+
+```
