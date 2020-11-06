@@ -24,9 +24,9 @@ For this project, I have used [Stack Overflow data from 2019](https://insights.s
 what factors lead developers to stay longer in their current jobs. I have broken the analysis down in the 
 following questions: 
 
-1. Does the job role lead developers stay longer in the job ?
-2. Wishing to become a manager leads developers stay longer in a job ?
-3. What other factors lead developers stay longer in their jobs ?
+1. Does the job role lead developers to stay longer in the job ?
+2. Does wishing to become a manager leads developers to stay longer in a job ?
+3. What other factors lead developers to stay longer in their jobs ?
 
 ## File Descriptions <a name="files"></a>
 
@@ -37,7 +37,7 @@ following questions:
 
 ## Results<a name="results"></a>
 
-The main findings of the code can be found at the post available [here]().
+The main findings of the code can be found at the post available [here](https://besson.medium.com/what-makes-you-stay-many-years-in-a-job-2c2cc34db17d).
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
 
