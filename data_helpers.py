@@ -9,23 +9,6 @@ from sklearn.metrics import accuracy_score
 from typing import List
 
 
-def bucketize_last_hire_date(last_hire_date) -> str:
-    """
-    INPUT
-    last_hire_date - last hire data variable answer
-    OUTPUT
-    bucket number - a discrete value assigned to each answer
-    """
-    buckets = {
-        'Less than a year ago': 1,
-        '1-2 years ago': 2,
-        '3-4 years ago': 3,
-        'More than 4 years ago': 4
-    }
-
-    return buckets.get(last_hire_date, -1)
-
-
 def set_dependent_variable(last_hire_date) -> int:
     """
     INPUT

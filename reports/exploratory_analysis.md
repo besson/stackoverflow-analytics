@@ -5,7 +5,6 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from data_helpers import bucketize_last_hire_date
 from data_helpers import transform_coding_experience
 from data_helpers import filter_employed_developers
 
@@ -384,42 +383,37 @@ We definitely started to understand our data! We have information about how long
 
 ### Data preparation
 
-First, we need to convert `LastHireDate` to discrete values:
-
-| Answer | Bucket |
-| --- | --- |
-| Less than a year ago | 1 |
-| 1-2 years ago | 2 |
-| 3-4 years ago | 3 |
-| More than 4 years ago | 4 |
-
-
 
 ```python
-p1_df.loc[:,'YearsInTheJob'] = p1_df['LastHireDate'].apply(bucketize_last_hire_date)
-p1_df['YearsInTheJob'].value_counts()
+p1_df['LastHireDate'].value_counts()
 ```
 
 
 
 
-     1    22378
-     2    19080
-     4    13453
-     3    10531
-    -1     2621
-    Name: YearsInTheJob, dtype: int64
+    Less than a year ago     22378
+    1-2 years ago            19080
+    More than 4 years ago    13453
+    3-4 years ago            10531
+    Name: LastHireDate, dtype: int64
 
 
 
-Then, we need to clean `DevType`. As a professional can have multiple job roles and we are interested in analyzing `YearsInTheJob` per job role, we will attribute `YearsInTheJob` to each job role defined by the professional.
+Let's remove rows when `LastHireDate` is NA:
+
+
+```python
+p1_df = p1_df.dropna(subset=['LastHireDate'])
+```
+
+Then, we need to clean `DevType`. As a professional can have multiple job roles and we are interested in analyzing `LastHireDate` per job role, we will attribute `LastHireDate` to each job role defined by the professional.
 
 
 ```python
 p1_df.loc[:,'JobRole'] = p1_df['DevType'].apply(lambda x: str(x).split(';'))
 p1_df = p1_df.explode('JobRole')
 p1_df = p1_df[p1_df.JobRole != 'nan']
-p1_df[['JobRole', 'YearsInTheJob']].head()
+p1_df[['JobRole', 'LastHireDate']].head()
 ```
 
 
@@ -444,34 +438,34 @@ p1_df[['JobRole', 'YearsInTheJob']].head()
     <tr style="text-align: right;">
       <th></th>
       <th>JobRole</th>
-      <th>YearsInTheJob</th>
+      <th>LastHireDate</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>2</th>
       <td>Designer</td>
-      <td>2</td>
+      <td>1-2 years ago</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Developer, back-end</td>
-      <td>2</td>
+      <td>1-2 years ago</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Developer, front-end</td>
-      <td>2</td>
+      <td>1-2 years ago</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Developer, full-stack</td>
-      <td>2</td>
+      <td>1-2 years ago</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Developer, full-stack</td>
-      <td>1</td>
+      <td>Less than a year ago</td>
     </tr>
   </tbody>
 </table>
@@ -487,45 +481,266 @@ p1_df['YearsCodePro'] = p1_df['YearsCodePro'].fillna(value=-1)
 p1_df.loc[:,'YearsCodePro'] = p1_df['YearsCodePro'].apply(transform_coding_experience)
 ```
 
+
+```python
+legend = ['Less than a year ago', '1-2 years ago', '3-4 years ago', 'More than 4 years ago']
+```
+
 ### Answering the question
 
-For each job role, we want to know what is the most frequent `YearsInTheJob` value. As `YearsInTheJob` is not continuous, we will use the `mode` of this variable.
+For each job role, we want to analyze the distribution of `LastHireDate` for that job role.
 
 
 ```python
-agg_p1_df = p1_df.groupby(['JobRole']).agg({'YearsInTheJob': lambda x: x.value_counts().index[0]})\
-                 .sort_values(by='YearsInTheJob', ascending=False)\
-                 .reset_index()
+plt.style.use('tableau-colorblind10')
 
-plt.figure(figsize=(12,6))
-sns.barplot(x='YearsInTheJob', y='JobRole', orient='h', data=agg_p1_df, color='cornflowerblue');
-plt.title('Years in the current job by job role (mode)');
+p1_plot = (p1_df.groupby(['JobRole', 'LastHireDate']).size()  / p1_df.groupby(['JobRole']).size() * 100).unstack()[legend]\
+        .sort_values(by=legend, ascending=True)
+
+p1_plot.plot(kind='barh', stacked=True, figsize=(12, 12), align='center', width=0.8)\
+       .legend(bbox_to_anchor=(1.0, 0.5));
+
+plt.title('Last hired date by Job Role');
+plt.xlabel('Last hire date distribution (%)');
+plt.ylabel('Job Role');
+
+plt.style.use('default')
 ```
 
 
     
-![png](exploratory_analysis_files/exploratory_analysis_27_0.png)
+![png](exploratory_analysis_files/exploratory_analysis_29_0.png)
     
+
+
+
+```python
+p1_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>LastHireDate</th>
+      <th>Less than a year ago</th>
+      <th>1-2 years ago</th>
+      <th>3-4 years ago</th>
+      <th>More than 4 years ago</th>
+    </tr>
+    <tr>
+      <th>JobRole</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Senior executive/VP</th>
+      <td>18.158996</td>
+      <td>22.175732</td>
+      <td>17.489540</td>
+      <td>42.175732</td>
+    </tr>
+    <tr>
+      <th>Engineering manager</th>
+      <td>19.543465</td>
+      <td>22.701689</td>
+      <td>20.856785</td>
+      <td>36.898061</td>
+    </tr>
+    <tr>
+      <th>Product manager</th>
+      <td>21.925926</td>
+      <td>24.518519</td>
+      <td>19.518519</td>
+      <td>34.037037</td>
+    </tr>
+    <tr>
+      <th>Database administrator</th>
+      <td>24.630334</td>
+      <td>26.292072</td>
+      <td>17.884805</td>
+      <td>31.192790</td>
+    </tr>
+    <tr>
+      <th>System administrator</th>
+      <td>25.242868</td>
+      <td>25.397070</td>
+      <td>17.548188</td>
+      <td>31.811874</td>
+    </tr>
+    <tr>
+      <th>Data or business analyst</th>
+      <td>27.703420</td>
+      <td>27.597196</td>
+      <td>17.272148</td>
+      <td>27.427236</td>
+    </tr>
+    <tr>
+      <th>Developer, desktop or enterprise applications</th>
+      <td>27.818726</td>
+      <td>26.833540</td>
+      <td>16.930599</td>
+      <td>28.417135</td>
+    </tr>
+    <tr>
+      <th>DevOps specialist</th>
+      <td>28.175457</td>
+      <td>27.691066</td>
+      <td>19.052745</td>
+      <td>25.080732</td>
+    </tr>
+    <tr>
+      <th>Marketing or sales professional</th>
+      <td>28.440367</td>
+      <td>27.522936</td>
+      <td>16.743119</td>
+      <td>27.293578</td>
+    </tr>
+    <tr>
+      <th>Educator</th>
+      <td>28.976325</td>
+      <td>27.075692</td>
+      <td>17.805935</td>
+      <td>26.142047</td>
+    </tr>
+    <tr>
+      <th>Developer, QA or test</th>
+      <td>29.302326</td>
+      <td>29.689922</td>
+      <td>18.158915</td>
+      <td>22.848837</td>
+    </tr>
+    <tr>
+      <th>Designer</th>
+      <td>29.426351</td>
+      <td>27.640932</td>
+      <td>16.548190</td>
+      <td>26.384526</td>
+    </tr>
+    <tr>
+      <th>Developer, embedded applications or devices</th>
+      <td>29.549973</td>
+      <td>28.212543</td>
+      <td>17.079342</td>
+      <td>25.158142</td>
+    </tr>
+    <tr>
+      <th>Engineer, site reliability</th>
+      <td>29.811805</td>
+      <td>27.373824</td>
+      <td>19.332763</td>
+      <td>23.481608</td>
+    </tr>
+    <tr>
+      <th>Scientist</th>
+      <td>30.745814</td>
+      <td>26.407915</td>
+      <td>18.226788</td>
+      <td>24.619482</td>
+    </tr>
+    <tr>
+      <th>Engineer, data</th>
+      <td>32.767876</td>
+      <td>29.439553</td>
+      <td>16.791926</td>
+      <td>21.000644</td>
+    </tr>
+    <tr>
+      <th>Developer, full-stack</th>
+      <td>33.050724</td>
+      <td>29.018442</td>
+      <td>16.598199</td>
+      <td>21.332634</td>
+    </tr>
+    <tr>
+      <th>Developer, back-end</th>
+      <td>33.502662</td>
+      <td>28.949140</td>
+      <td>16.736030</td>
+      <td>20.812167</td>
+    </tr>
+    <tr>
+      <th>Developer, front-end</th>
+      <td>34.181695</td>
+      <td>29.178786</td>
+      <td>16.361257</td>
+      <td>20.278263</td>
+    </tr>
+    <tr>
+      <th>Developer, mobile</th>
+      <td>34.547796</td>
+      <td>30.840004</td>
+      <td>16.036434</td>
+      <td>18.575766</td>
+    </tr>
+    <tr>
+      <th>Academic researcher</th>
+      <td>34.913688</td>
+      <td>29.321663</td>
+      <td>16.435692</td>
+      <td>19.328957</td>
+    </tr>
+    <tr>
+      <th>Developer, game or graphics</th>
+      <td>35.145841</td>
+      <td>29.456248</td>
+      <td>16.636658</td>
+      <td>18.761253</td>
+    </tr>
+    <tr>
+      <th>Data scientist or machine learning specialist</th>
+      <td>35.760649</td>
+      <td>30.507099</td>
+      <td>15.760649</td>
+      <td>17.971602</td>
+    </tr>
+    <tr>
+      <th>Student</th>
+      <td>51.255634</td>
+      <td>30.006439</td>
+      <td>11.461687</td>
+      <td>7.276240</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
 #### Conclusions
 
-* There are 6 job roles where most of professionals are 4 years or more in their current jobs:
+* There are 4 job roles where most of professionals are 3 years or more in their current jobs:
 
-  * System administrator
-  * Database administrator
   * Senior executive/VP
-  * Product manager
   * Engineering manager
-  * Developer, desktop or enterprise applications
+  * Product manager
+  * Database administrator
 
 
-* It seems professionals working in management positions stay longer in their jobs. A hypothesis is those professionals developed their entire careers in the same company. That is something we will investigate in the second part of this analysis. The only exception in this pattern is `Developer, desktop or enterprise applications`.
+* It seems professionals working in management positions stay longer in their jobs. A hypothesis is those professionals developed their entire careers in the same company. That is something we will investigate in the second part of this analysis. 
 
 
-* We can also observe the mode for `Developer QA or test` is higher than for the other developers.
-
-
+* It is expected that most of  Students are `Less than 1 year` in their current jobs
 
 Regarding the remaining job roles, we observe turn-over may be high as mostly of the interviewed professionals are less than 1 year in their jobs. Or maybe these professionals may be in the beginning of their careers. Let's drill our analysis down in more variables for each job role. Let's get started by years coding (experience).
 
@@ -533,7 +748,7 @@ Regarding the remaining job roles, we observe turn-over may be high as mostly of
 ```python
 sns.set(font_scale=1.6)
 
-job_roles = sorted(agg_p1_df.JobRole.unique())
+job_roles = sorted(p1_df.JobRole.unique())
 
 fig = plt.figure(figsize=(32, 32))
 fig.subplots_adjust(hspace=0.4, wspace=0.4)
@@ -561,7 +776,7 @@ sns.set(font_scale=1)
 
 
     
-![png](exploratory_analysis_files/exploratory_analysis_29_0.png)
+![png](exploratory_analysis_files/exploratory_analysis_32_0.png)
     
 
 
@@ -586,68 +801,52 @@ df2[df2.QuestionText == 'Do you want to become a manager yourself in the future?
 
 
 ```python
-p1_df['MgrWant'].value_counts()
+df['MgrWant'].value_counts()
 ```
 
 
 
 
-    Not sure                  60504
-    No                        54326
-    Yes                       44987
-    I am already a manager     9434
+    Not sure                  22276
+    No                        20383
+    Yes                       15565
+    I am already a manager     3008
     Name: MgrWant, dtype: int64
 
 
 
 
 ```python
-manager_df = p1_df[p1_df['MgrWant'].isin(['Yes'])].groupby(['JobRole']).size() / p1_df.groupby(['JobRole']).size()
-manager_df.sort_values(ascending=False).head()
-```
-
-
-
-
-    JobRole
-    Developer, mobile                  0.284702
-    Designer                           0.276505
-    Data or business analyst           0.269758
-    Academic researcher                0.261189
-    Marketing or sales professional    0.250000
-    dtype: float64
-
-
-
-We can observe, professionals who are `Developer mobile`, `Designer`, `Data or business analyst`, `Academic researcher` or `Marketing or sales professional` are more willing to become a manager. Let's check weather they are more willing to stay longer in their current jobs.
-
-Let's get started by filtering our current result set by professionals who currently are not a manager but wish to become one.
-
-
-```python
-p2_df = p1_df[(p1_df.MgrWant == 'Yes') &
-              (~p1_df.JobRole.isin(['Senior executive/VP', 'Product manager', 'Engineering manager']))
-]
-
+p2_df = df.copy()
+p2_df = filter_employed_developers(p2_df)
+p2_df = p2_df.dropna(subset=['LastHireDate', 'MgrWant'])
 p2_df.shape
 ```
 
 
 
 
-    (44343, 87)
+    (58980, 85)
 
 
 
 
 ```python
-agg_p2_df = p2_df.groupby(['JobRole']).agg({'YearsInTheJob': lambda x: x.value_counts().index[0]})\
-                 .sort_values(by='YearsInTheJob', ascending=False)\
-                 .reset_index()
+plt.style.use('tableau-colorblind10')
 
-plt.figure(figsize=(12,6))
-sns.barplot(x='YearsInTheJob', y='JobRole', orient='h', data=agg_p2_df, color='cornflowerblue');
-plt.title('Years in the current job by job role when whishing to become a manager');
+
+p2_plot = (p2_df.groupby(['MgrWant', 'LastHireDate']).size()  / p2_df.groupby(['MgrWant']).size() * 100).unstack()[legend]\
+        .sort_values(by='MgrWant', ascending=False)
+
+p2_plot.plot(kind='bar', stacked=True, figsize=(6, 4)
+      ).legend(bbox_to_anchor=(1.0, 0.5));
+
+plt.title('Last hired date when developer wishes to become a manager');
+plt.xlabel('Want to become a manager ?');
+plt.ylabel('Last hire date distribution (%)');
+plt.xticks(rotation=0)
+
+plt.style.use('default')
 ```
 
 
@@ -656,55 +855,89 @@ plt.title('Years in the current job by job role when whishing to become a manage
     
 
 
+
+```python
+p2_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>LastHireDate</th>
+      <th>Less than a year ago</th>
+      <th>1-2 years ago</th>
+      <th>3-4 years ago</th>
+      <th>More than 4 years ago</th>
+    </tr>
+    <tr>
+      <th>MgrWant</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Yes</th>
+      <td>40.591398</td>
+      <td>32.694892</td>
+      <td>14.744624</td>
+      <td>11.969086</td>
+    </tr>
+    <tr>
+      <th>Not sure</th>
+      <td>37.004853</td>
+      <td>30.940606</td>
+      <td>15.960250</td>
+      <td>16.094292</td>
+    </tr>
+    <tr>
+      <th>No</th>
+      <td>28.735110</td>
+      <td>27.251161</td>
+      <td>16.974561</td>
+      <td>27.039168</td>
+    </tr>
+    <tr>
+      <th>I am already a manager</th>
+      <td>16.057294</td>
+      <td>22.125895</td>
+      <td>20.128157</td>
+      <td>41.688654</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 #### Conclusions
 
-It seems that wishing to become a manager in the future does not make professionals stay longer in their current jobs. The mode for most of professionals also concentrate in 1 (**less than 1 year**). Maybe it changes for experienced professionals. Let's analyze professionals with at least 10 years of experience.
+We had quite surprising findings in this last plot:
 
+* Clearly, the data indicates that developers who does **NOT** `wish to become a manager` are longer in their current jobs. More than that, around 27% of are  **more than 4 years** in their current jobs.
 
-```python
-df2[df2.QuestionText == 'How many years have you coded professionally (as a part of your work)?']['Column'].values[0]
-```
+* About 41% of those who `wish to become a manager` are **Less than a year** in their current jobs
 
-
-
-
-    'YearsCodePro'
-
-
-
-
-```python
-p2a_df = p2_df[p2_df.YearsCodePro >= 10]
-p2a_df.shape
-```
-
-
-
-
-    (7954, 87)
-
-
-
-
-```python
-agg_p2a_df = p2a_df.groupby(['JobRole']).agg({'YearsInTheJob': lambda x: x.value_counts().index[0]})\
-                 .sort_values(by='YearsInTheJob', ascending=False)\
-                 .reset_index()
-
-plt.figure(figsize=(12,6))
-sns.barplot(x='YearsInTheJob', y='JobRole', orient='h', data=agg_p2a_df, color='cornflowerblue');
-plt.title('Years in the current job by job role when whishing to become a manager (> 10 years coding)');
-```
-
-
-    
-![png](exploratory_analysis_files/exploratory_analysis_42_0.png)
-    
-
-
-#### Conclusions
-
-Based on the last plot, the data suggest our hypothesis is promising. Most of the pore experienced developers who wish to become a manager in the future are longer in their current jobs!
+* As observed in the Part I of this analysis, most of developers (around 62%) who are already managers are at least 3 years in their current jobs.
 
 
 ```python
