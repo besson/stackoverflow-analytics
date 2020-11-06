@@ -145,8 +145,8 @@ X = encode_categorical_features(X, cat_features)
 X.shape
 ```
 
-    CPU times: user 9.09 s, sys: 1.62 s, total: 10.7 s
-    Wall time: 10.8 s
+    CPU times: user 8.82 s, sys: 1.47 s, total: 10.3 s
+    Wall time: 10.4 s
 
 
 
@@ -415,7 +415,7 @@ shap.force_plot(explainer.expected_value[1], shap_values[1], choosen_instance)
 ![png](years_current_job_prediction_files/shap_value1.png)
 
 
-We have shapley values for the features. Feature values in pink increases the prediction. Size of the bar is the magnitude of the feature's effect. Feature values in blue cause to decrease the prediction. In this sample, we can observe the following features contributed more to have a positive classification (class = 1):
+We have hapley values for the features. Feature values in pink increases the prediction. Size of the bar is the magnitude of the feature's effect. Feature values in blue cause to decrease the prediction. In this sample, we can observe the following features contributed more to have a positive classification (class = 1):
 
 * `JobSeek: I am not interested in new job opportunities = 0`
 * `YearsCode = 14`
@@ -423,7 +423,7 @@ We have shapley values for the features. Feature values in pink increases the pr
 * `differentRoles = 7`
 
 In this case, the candidate is more than 1 year in the current job when these conditions happen:
-* Not looking for a new job
+* Looking for a new job
 * Have good experience (at least 5 coding as a professional)
 * Assume different job roles 
 
@@ -436,6 +436,7 @@ choosen_instance = Xf[Xf.pred == 0].sample(1, random_state=42).drop('pred', axis
 shap_values = explainer.shap_values(choosen_instance)
 shap.force_plot(explainer.expected_value[1], shap_values[1], choosen_instance)
 ```
+
 
 ![png](years_current_job_prediction_files/shap_value2.png)
 
@@ -472,4 +473,9 @@ shap.summary_plot(shap_values, sample)
     Wall time: 17min 25s
 
 
-By analyzing a sample of 100 randomly picked instances, we can confirm what we had already observed. The current developer coding experience, the fact the developer is not looking for a new job and the person's age are the major factors to determine whether developer will stay longer than 1 year in the current job or not.
+After analyzing a sample of 100 randomly picked instances, our previous observations are stronger. It worths noting the developer professional coding experience, the fact the developer is looking for a new job and the person's age have higher contribution in determining whether developer will stay longer than 1 year in the current job or not.
+
+
+```python
+
+```
