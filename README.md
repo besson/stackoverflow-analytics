@@ -28,6 +28,8 @@ following questions:
 2. Does wishing to become a manager leads developers to stay longer in a job ?
 3. What other factors lead developers to stay longer in their jobs ?
 
+All results are presented in my Medium post: [What makes you stay many years in a job ?](https://besson.medium.com/what-makes-you-stay-many-years-in-a-job-2c2cc34db17d)
+
 ## File Descriptions <a name="files"></a>
 
 * **exploratory_analysis.ipynb**: notebook to tackle questions 1 and 2.
@@ -37,7 +39,7 @@ following questions:
 
 ## Results<a name="results"></a>
 
-The main findings of the code can be found at the post available [here](https://besson.medium.com/what-makes-you-stay-many-years-in-a-job-2c2cc34db17d).
+The main findings of the code can be found at the Medium post available [here](https://besson.medium.com/what-makes-you-stay-many-years-in-a-job-2c2cc34db17d).
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
 
